@@ -1,5 +1,10 @@
-# Force HTTPS
 RewriteEngine On
+
+# Send everyone to https://www.stalliondemo.com (one address for Google)
+RewriteCond %{HTTP_HOST} ^stalliondemo\.com$ [NC]
+RewriteRule ^(.*)$ https://www.stalliondemo.com/$1 [L,R=301]
+
+# Force HTTPS
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [L,R=301]
 
