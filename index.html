@@ -423,7 +423,7 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
   </svg>
   <button type="button" class="replay" id="replay" aria-label="Replay the demolition animation">↻ Knock it down again</button>
   <div class="wrap">
-    <div class="stack" style="gap:28px;min-width:0;padding-top:24px">
+    <div class="stack" style="gap:28px;min-width:0;padding-top:24px;overflow-wrap:break-word">
       <p class="eyebrow">Interior Demolition Contractor · Calgary</p>
       <h1 id="hero-title">Interior demolition, <span class="gold">cleared for <span class="rot"><span class="rot-track" id="rot"><span>what’s next.</span></span></span></span></h1>
       <p class="sub">Commercial strip-outs, selective demo and full interior tear-outs across Calgary — done clean, hauled away, and left ready to build. And when you’re ready to build, Stallion Contracting picks up exactly where our crew left off.</p>
@@ -1115,6 +1115,23 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
       if (wi === words.length) setTimeout(function () { rot.style.transition = 'none'; wi = 0; rot.style.transform = 'none'; void rot.offsetWidth; rot.style.transition = ''; }, 650);
     }, 2600);
   }
+
+  // Fit the hero headline to its column (measures the real font, incl. every rotating word)
+  var h1 = document.getElementById('hero-title');
+  function fitHero(){
+    h1.style.fontSize = '';
+    var base = parseFloat(getComputedStyle(h1).fontSize), avail = h1.clientWidth;
+    var probe = document.createElement('span');
+    probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;left:0;top:0';
+    h1.appendChild(probe);
+    var max = 0;
+    ['Interior', 'demolition,', 'cleared for'].concat(words).forEach(function (t) { probe.textContent = t; max = Math.max(max, probe.getBoundingClientRect().width); });
+    probe.remove();
+    if (max > avail) h1.style.fontSize = Math.floor(base * avail / max * 0.97) + 'px';
+  }
+  fitHero();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitHero);
+  var fitT; window.addEventListener('resize', function () { clearTimeout(fitT); fitT = setTimeout(fitHero, 120); });
 
   var mq = document.getElementById('marquee');
   if (!reduceMotion) { var copy = mq.querySelector('ul').cloneNode(true); copy.setAttribute('aria-hidden', 'true'); mq.appendChild(copy); }
