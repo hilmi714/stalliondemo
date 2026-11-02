@@ -250,6 +250,29 @@ footer.site .col a:hover{color:var(--gold2)}
 footer.site address{font-style:normal}
 .legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-top:24px;border-top:1px solid #222226;font-size:14px;color:var(--dim)}
 
+/* gap calculator */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:32px;align-items:center;padding:32px;background:var(--card);border:1px solid var(--line);border-radius:6px}
+.calc h3{margin:0;font-size:clamp(24px,2.6vw,32px);line-height:1.05;font-weight:900;font-stretch:120%;text-transform:uppercase}
+.slider{display:flex;flex-direction:column;gap:10px}
+.slider-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.slider label{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--soft)}
+.slider output{white-space:nowrap;font-size:22px;font-weight:900;font-stretch:115%;color:var(--cream)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;cursor:pointer;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(to right,var(--gold) var(--fill,50%),#34343A var(--fill,50%))}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:#34343A}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:var(--gold)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-10px;border-radius:50%;background:var(--cream);border:4px solid var(--gold)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--cream);border:4px solid var(--gold)}
+input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+.calc-result{display:flex;flex-direction:column;gap:10px;padding:28px;border:1px dashed #8C4A3A;border-radius:6px;background:repeating-linear-gradient(135deg,rgba(140,74,58,.12) 0 10px,transparent 10px 20px)}
+.calc-result .big{font-size:clamp(44px,6vw,72px);line-height:1;font-weight:900;font-stretch:125%;color:#F0B4A4}
+.calc-result p{margin:0;color:var(--soft)}
+
+/* scroll reveal */
+.js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.js .reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
 /* mobile */
 .mobile-bar{display:none}
 @media (max-width:1100px){.menu{display:none}}
@@ -259,6 +282,8 @@ footer.site address{font-style:normal}
   .pad{padding-top:72px;padding-bottom:72px}
   .hero .wrap{padding-top:48px}
   .quote{padding:22px}
+  .calc{padding:20px}
+  .calc-result{padding:20px}
   .card.feature{grid-column:auto}
   .hero .ghost{font-size:160px}
   .topbar .hide-sm{display:none}
@@ -447,6 +472,30 @@ footer.site address{font-style:normal}
           <li class="check"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9973F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Build crew mobilizes as demo wraps up</li>
           <li class="check"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C9973F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>One point of contact, start to keys</li>
         </ul>
+      </div>
+    </div>
+
+    <div class="calc" id="gap-calc">
+      <div class="stack" style="gap:24px">
+        <div class="stack" style="gap:10px">
+          <p class="eyebrow" style="font-size:12px">Gap calculator</p>
+          <h3>What does the gap between demo and build cost you?</h3>
+          <p class="muted" style="margin:0">Drag the sliders to match your space.</p>
+        </div>
+        <div class="slider">
+          <div class="slider-top"><label for="rent">Monthly rent</label><output id="rent-out" for="rent">$6,000</output></div>
+          <input type="range" id="rent" min="1000" max="30000" step="500" value="6000">
+        </div>
+        <div class="slider">
+          <div class="slider-top"><label for="weeks">Weeks waiting on a builder</label><output id="weeks-out" for="weeks">4 weeks</output></div>
+          <input type="range" id="weeks" min="1" max="12" step="1" value="4">
+        </div>
+      </div>
+      <div class="calc-result" aria-live="polite">
+        <span style="font-family:'Michroma',sans-serif;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute)">Rent paid on an empty space</span>
+        <span class="big" id="gap-cost">$5,538</span>
+        <p>That’s money spent before you’ve built a thing. With Stallion, the build is quoted on the same site walk and the crew is lined up before demo ends.</p>
+        <div><a class="btn btn-gold" href="#quote" style="margin-top:6px">Close the gap — quote demo + build</a></div>
       </div>
     </div>
 
@@ -757,6 +806,54 @@ footer.site address{font-style:normal}
       btn.disabled = false; btn.textContent = 'Book My Free Site Walk →';
     });
   });
+
+
+  // Gap calculator
+  var rent = document.getElementById('rent'), weeks = document.getElementById('weeks');
+  function money(n){ return '$' + Math.round(n).toLocaleString('en-CA'); }
+  function fill(el){ el.style.setProperty('--fill', ((el.value - el.min) / (el.max - el.min) * 100) + '%'); }
+  function calc(){
+    var r = +rent.value, w = +weeks.value;
+    document.getElementById('rent-out').textContent = money(r);
+    document.getElementById('weeks-out').textContent = w + (w === 1 ? ' week' : ' weeks');
+    document.getElementById('gap-cost').textContent = money(r * 12 / 52 * w);
+    fill(rent); fill(weeks);
+  }
+  rent.addEventListener('input', calc); weeks.addEventListener('input', calc); calc();
+
+  // Scroll reveal + count-up
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if ('IntersectionObserver' in window && !reduce) {
+    document.documentElement.classList.add('js');
+    var groups = ['.sec .eyebrow + .h2', '.cards > *', '.steps > li', '.rows > div', '.photos > figure', '.boxes > div', '.timeline-card', '.calc', '.offer', '.list-2', '.photo.tall', '.areas', '.faq'];
+    groups.forEach(function (sel) {
+      document.querySelectorAll(sel).forEach(function (el, i) {
+        if (el.closest('.hero')) return;
+        el.classList.add('reveal');
+        el.style.transitionDelay = (Math.min(i, 6) * 70) + 'ms';
+      });
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting || e.boundingClientRect.top < 0) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+    var ticking = false;
+    function sweep(){ ticking = false; document.querySelectorAll('.reveal:not(.in)').forEach(function (el) { if (el.getBoundingClientRect().top < window.innerHeight) { el.classList.add('in'); io.unobserve(el); } }); }
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(sweep); } }, { passive: true });
+    window.addEventListener('hashchange', sweep);
+
+    var counted = false;
+    var proof = document.querySelector('.proof');
+    new IntersectionObserver(function (entries, obs) {
+      if (!entries[0].isIntersecting || counted) return; counted = true; obs.disconnect();
+      proof.querySelectorAll('b').forEach(function (b) {
+        var m = b.textContent.match(/^(\d+)(.*)$/); if (!m) return;
+        var end = +m[1], suffix = m[2], t0 = null;
+        function step(t){ if (!t0) t0 = t; var k = Math.min((t - t0) / 1100, 1); b.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))) + suffix; if (k < 1) requestAnimationFrame(step); }
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.5 }).observe(proof);
+  }
 
   document.getElementById('yr').textContent = new Date().getFullYear();
 })();
