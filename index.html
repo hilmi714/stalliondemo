@@ -311,6 +311,38 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
 .js .reveal.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
 
+/* animated hero: wall knock-down + blueprint */
+.wall{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.tile{position:absolute;background:#141417;border:1px solid #202025;border-radius:2px;box-shadow:inset 0 1px 0 rgba(255,255,255,.025);will-change:transform,opacity}
+.tile.fall{animation:fall 1.15s cubic-bezier(.55,0,.85,.35) forwards}
+@keyframes fall{0%{transform:none;opacity:1}14%{transform:translate(var(--sx),-3px) rotate(var(--sr));opacity:1}100%{transform:translate(var(--dx),110vh) rotate(var(--dr));opacity:0}}
+.dust{position:absolute;width:4px;height:4px;border-radius:50%;background:#6B5326;opacity:0;pointer-events:none}
+.dust.go{animation:dust 1.4s ease-out forwards}
+@keyframes dust{0%{opacity:.8;transform:none}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+.blueprint{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity .8s ease}
+.blueprint.on{opacity:1}
+.blueprint path,.blueprint rect,.blueprint line{fill:none;stroke:#C9973F;stroke-width:1.2;stroke-dasharray:1;stroke-dashoffset:1;vector-effect:non-scaling-stroke}
+.blueprint .thin{stroke-width:.8;opacity:.6}
+.blueprint.on path,.blueprint.on rect,.blueprint.on line{animation:draw 2.2s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.blueprint text{fill:#C9973F;font-family:'Michroma',sans-serif;font-size:11px;letter-spacing:.2em;opacity:0;transition:opacity .6s ease 1.6s}
+.blueprint.on text{opacity:.9}
+.hero .wrap{z-index:1}
+.replay{position:absolute;right:16px;bottom:14px;z-index:2;min-height:36px;padding:0 14px;border-radius:999px;border:1px solid #3A3A40;background:rgba(10,10,11,.7);color:var(--mute);font:inherit;font-size:13px;font-weight:700;cursor:pointer;opacity:0;transition:opacity .4s}
+.replay.show{opacity:1}
+.replay:hover{color:var(--gold2);border-color:var(--gold)}
+/* rotating headline word */
+.rot{display:block;height:1.02em;overflow:hidden;position:relative}
+.rot-track{display:block;transition:transform .6s cubic-bezier(.7,0,.2,1)}
+.rot-track>span{display:block;height:1.02em;line-height:1.02em;white-space:nowrap}
+/* marquee ticker */
+.ticker{overflow:hidden}
+.ticker .track{display:flex;width:max-content;animation:marq 38s linear infinite}
+.ticker:hover .track{animation-play-state:paused}
+.ticker ul{flex-wrap:nowrap;max-width:none;margin:0;justify-content:flex-start;padding:20px 14px}
+@keyframes marq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker .track{animation:none;width:auto}.ticker ul{flex-wrap:wrap;justify-content:center}.blueprint{opacity:1}.blueprint path,.blueprint rect,.blueprint line{stroke-dashoffset:0;animation:none}.blueprint text{opacity:.9}}
+
 /* mobile */
 .mobile-bar{display:none}
 @media (max-width:1100px){.menu{display:none}}
@@ -366,12 +398,34 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
 
 <!-- HERO -->
 <section id="top" class="hero sec" aria-labelledby="hero-title">
-  <div class="ghost" aria-hidden="true">DEMO</div>
-  <div class="stripes" aria-hidden="true"></div>
+  <div class="wall" id="wall" aria-hidden="true"></div>
+  <svg class="blueprint" id="blueprint" aria-hidden="true" viewBox="0 0 1440 820" preserveAspectRatio="xMidYMid slice">
+    <g opacity=".17">
+      <rect x="60" y="60" width="1320" height="700" pathLength="1"/>
+      <line x1="60" y1="300" x2="420" y2="300" pathLength="1"/>
+      <line x1="420" y1="60" x2="420" y2="420" pathLength="1"/>
+      <line x1="420" y1="420" x2="700" y2="420" pathLength="1"/>
+      <line x1="700" y1="60" x2="700" y2="760" pathLength="1"/>
+      <line x1="700" y1="520" x2="1380" y2="520" pathLength="1"/>
+      <line x1="1060" y1="520" x2="1060" y2="760" pathLength="1"/>
+      <path d="M60 560 h140 M280 560 h140 v200" pathLength="1"/>
+      <path d="M200 560 a80 80 0 0 1 80 -80" class="thin" pathLength="1"/>
+      <path d="M420 340 a80 80 0 0 1 -80 80" class="thin" pathLength="1"/>
+      <path d="M1060 640 a70 70 0 0 0 70 -70 M1060 570 h70" class="thin" pathLength="1"/>
+      <path d="M760 100 h260 v80 h-260 z M760 140 h260" class="thin" pathLength="1"/>
+      <path d="M1180 580 h150 v130 h-150 z M1255 580 v130" class="thin" pathLength="1"/>
+      <path d="M100 100 h120 v70 h-120 z" class="thin" pathLength="1"/>
+      <line x1="60" y1="30" x2="1380" y2="30" class="thin" pathLength="1"/>
+      <path d="M60 22 v16 M700 22 v16 M1380 22 v16" class="thin" pathLength="1"/>
+      <line x1="1410" y1="60" x2="1410" y2="760" class="thin" pathLength="1"/>
+      <path d="M1402 60 h16 M1402 520 h16 M1402 760 h16" class="thin" pathLength="1"/>
+    </g>
+  </svg>
+  <button type="button" class="replay" id="replay" aria-label="Replay the demolition animation">↻ Knock it down again</button>
   <div class="wrap">
     <div class="stack" style="gap:28px;min-width:0;padding-top:24px">
       <p class="eyebrow">Interior Demolition Contractor · Calgary</p>
-      <h1 id="hero-title">Interior demolition, <span class="gold">cleared for what’s next.</span></h1>
+      <h1 id="hero-title">Interior demolition, <span class="gold">cleared for <span class="rot"><span class="rot-track" id="rot"><span>what’s next.</span></span></span></span></h1>
       <p class="sub">Commercial strip-outs, selective demo and full interior tear-outs across Calgary — done clean, hauled away, and left ready to build. And when you’re ready to build, Stallion Contracting picks up exactly where our crew left off.</p>
       <div style="display:flex;flex-wrap:wrap;gap:14px">
         <a class="btn btn-gold" href="#quote">Get My Demo Quote →</a>
@@ -463,9 +517,9 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
 
 <!-- TICKER -->
 <section class="ticker" aria-label="What we remove">
-  <ul>
+  <div class="track" id="marquee"><ul>
     <li>Strip-outs</li><li aria-hidden="true">✕</li><li>Selective demo</li><li aria-hidden="true">✕</li><li>Drywall &amp; ceilings</li><li aria-hidden="true">✕</li><li>Flooring</li><li aria-hidden="true">✕</li><li>Kitchens &amp; washrooms</li><li aria-hidden="true">✕</li><li>Exterior demo</li><li aria-hidden="true">✕</li><li>Concrete</li><li aria-hidden="true">✕</li><li>Haul-away</li>
-  </ul>
+  </ul></div>
 </section>
 
 <!-- DEMO TO BUILD -->
@@ -1013,6 +1067,57 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
       });
     });
   });
+
+  // ---- Animated hero: wall knock-down, blueprint, rotating word, marquee ----
+  var hero = document.querySelector('.hero'), wall = document.getElementById('wall'), bp = document.getElementById('blueprint'), replay = document.getElementById('replay');
+  function buildWall(){
+    wall.innerHTML = '';
+    var W = hero.offsetWidth, H = hero.offsetHeight, tw = W < 720 ? 64 : 96, th = W < 720 ? 38 : 52, g = 4;
+    var cols = Math.ceil(W / (tw + g)) + 1, rows = Math.ceil(H / (th + g));
+    var frag = document.createDocumentFragment(), tiles = [];
+    for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+      var t = document.createElement('div'); t.className = 'tile';
+      var x = c * (tw + g) - (r % 2 ? tw / 2 : 0), y = r * (th + g);
+      t.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + tw + 'px;height:' + th + 'px';
+      t._d = (cols - c) * 38 + r * 22 + Math.random() * 140; // sweep from the right
+      frag.appendChild(t); tiles.push(t);
+    }
+    wall.appendChild(frag); return tiles;
+  }
+  function knockDown(){
+    bp.classList.remove('on'); replay.classList.remove('show');
+    void bp.offsetWidth;
+    var tiles = buildWall(), max = 0;
+    tiles.forEach(function (t) {
+      var rnd = function (a) { return (Math.random() * 2 - 1) * a; };
+      t.style.setProperty('--sx', rnd(3) + 'px'); t.style.setProperty('--sr', rnd(4) + 'deg');
+      t.style.setProperty('--dx', rnd(160) + 'px'); t.style.setProperty('--dr', rnd(70) + 'deg');
+      t.style.animationDelay = (500 + t._d) + 'ms'; max = Math.max(max, t._d);
+      t.classList.add('fall');
+      if (Math.random() < .12) {
+        var d = document.createElement('div'); d.className = 'dust';
+        d.style.left = (parseFloat(t.style.left) + 40) + 'px'; d.style.top = (parseFloat(t.style.top) + 20) + 'px';
+        d.style.setProperty('--dx', rnd(60) + 'px'); d.style.setProperty('--dy', (-20 - Math.random() * 60) + 'px');
+        d.style.animationDelay = (520 + t._d) + 'ms'; d.classList.add('go'); wall.appendChild(d);
+      }
+    });
+    setTimeout(function () { bp.classList.add('on'); }, 500 + max * .55);
+    setTimeout(function () { wall.innerHTML = ''; replay.classList.add('show'); }, 500 + max + 1500);
+  }
+  if (!reduceMotion) { knockDown(); replay.addEventListener('click', knockDown); }
+  else { bp.classList.add('on'); replay.remove(); }
+
+  var words = ['what’s next.', 'your build.', 'opening day.', 'the rebuild.'], rot = document.getElementById('rot'), wi = 0;
+  if (!reduceMotion) {
+    words.slice(1).concat(words[0]).forEach(function (w) { var sp = document.createElement('span'); sp.textContent = w; sp.setAttribute('aria-hidden', 'true'); rot.appendChild(sp); });
+    setInterval(function () {
+      wi++; rot.style.transform = 'translateY(' + (-wi * 1.02) + 'em)';
+      if (wi === words.length) setTimeout(function () { rot.style.transition = 'none'; wi = 0; rot.style.transform = 'none'; void rot.offsetWidth; rot.style.transition = ''; }, 650);
+    }, 2600);
+  }
+
+  var mq = document.getElementById('marquee');
+  if (!reduceMotion) { var copy = mq.querySelector('ul').cloneNode(true); copy.setAttribute('aria-hidden', 'true'); mq.appendChild(copy); }
 
   // Scroll reveal + count-up
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
