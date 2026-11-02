@@ -268,6 +268,44 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
 .calc-result .big{font-size:clamp(44px,6vw,72px);line-height:1;font-weight:900;font-stretch:125%;color:#F0B4A4}
 .calc-result p{margin:0;color:var(--soft)}
 
+/* demo list builder */
+.builder{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:28px;align-items:start}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr));gap:12px}
+.item{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-height:118px;padding:18px 16px;background:var(--card);border:1px solid var(--line);border-radius:6px;color:var(--cream);font:inherit;font-size:15px;font-weight:700;line-height:1.25;text-align:left;cursor:pointer;transition:border-color .15s,background .15s,transform .15s}
+.item:hover{border-color:#5A5A62;transform:translateY(-2px)}
+.item svg{color:var(--gold)}
+.item[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.item[aria-pressed="true"] svg{color:var(--ink)}
+.item .tick{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;border:1.5px solid #4A4A52;display:flex;align-items:center;justify-content:center}
+.item[aria-pressed="true"] .tick{background:var(--ink);border-color:var(--ink);color:var(--gold)}
+.item .tick svg{display:none}
+.item[aria-pressed="true"] .tick svg{display:block;color:var(--gold)}
+.panel{position:sticky;top:120px;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--gold);border-radius:6px;padding:28px;display:flex;flex-direction:column;gap:18px}
+.panel h3{margin:0;font-size:22px;font-weight:900;font-stretch:115%;text-transform:uppercase}
+.panel ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto}
+.panel ol li{display:flex;gap:10px;align-items:center;padding:10px 12px;background:var(--ink);border:1px solid var(--line);border-radius:4px;font-size:15px}
+.panel ol li:before{content:"";flex:none;width:8px;height:8px;background:var(--gold);transform:rotate(45deg)}
+.empty{margin:0;padding:18px;border:1px dashed #4A4A52;border-radius:4px;color:var(--mute);font-size:15px;text-align:center}
+.sizes{display:flex;flex-wrap:wrap;gap:8px}
+
+/* readiness checklist */
+.ready{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:28px;align-items:start}
+.qs{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.qs li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 20px;padding:20px 0;border-bottom:1px solid var(--line)}
+.qs .q{flex:1 1 300px;font-size:18px;font-weight:700}
+.qs .q small{display:block;margin-top:2px;font-size:14px;font-weight:400;color:var(--mute)}
+.yn{display:inline-flex;padding:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;gap:4px}
+.yn button{min-height:44px;min-width:84px;padding:0 16px;border-radius:999px;border:0;background:transparent;color:var(--soft);font:inherit;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;cursor:pointer}
+.yn button[aria-pressed="true"][data-v="yes"]{background:var(--gold);color:var(--ink)}
+.yn button[aria-pressed="true"][data-v="no"]{background:var(--cream);color:var(--ink)}
+.meter{height:10px;border-radius:5px;background:#2A2A2E;overflow:hidden}
+.meter span{display:block;height:100%;width:0;background:var(--gold);transition:width .4s cubic-bezier(.2,.7,.2,1)}
+.score{font-size:clamp(48px,6vw,72px);line-height:1;font-weight:900;font-stretch:125%}
+.handle{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.handle li{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:var(--soft)}
+.handle li svg{flex:none;margin-top:3px}
+@media (max-width:720px){.panel{position:static;padding:20px}.items{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.item{min-height:96px;padding:14px 12px;font-size:14px}.item .tick{top:10px;right:10px}}
+
 /* scroll reveal */
 .js .reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
 .js .reveal.in{opacity:1;transform:none}
@@ -358,6 +396,7 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
         <input type="hidden" name="property" id="h-property" value="Commercial unit">
         <input type="hidden" name="scope" id="h-scope" value="Full interior strip-out">
         <input type="hidden" name="after_demo" id="h-next" value="Building new — quote it too">
+        <input type="hidden" name="demo_list" id="h-list" value="">
         <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none">
 
         <div>
@@ -534,6 +573,52 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
   </div>
 </section>
 
+<!-- DEMO LIST BUILDER -->
+<section id="demo-list" class="sec" aria-labelledby="dl-title">
+  <div class="wrap pad stack" style="gap:40px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+      <div class="stack" style="max-width:720px;gap:16px">
+        <p class="eyebrow">Build Your Demo List</p>
+        <h2 id="dl-title" class="h2">Tap what’s <span class="gold">coming out.</span></h2>
+      </div>
+      <p class="muted" style="margin:0;max-width:420px">Pick everything that needs to go. We’ll drop your list into the quote form so your site walk starts with the right scope.</p>
+    </div>
+    <div class="builder">
+      <div class="items" role="group" aria-label="Items to remove">
+          <button type="button" class="item" aria-pressed="false" data-item="Interior walls"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M3 15h18M9 4v6M15 10v5M9 15v5"/></svg><span>Interior walls</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Drywall &amp; ceilings"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 6l2 4h14l2-4M7 10v8M17 10v8"/></svg><span>Drywall &amp; ceilings</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Flooring &amp; tile"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span>Flooring &amp; tile</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Carpet &amp; adhesive"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4z"/><path d="M4 10h16M8 6v12"/></svg><span>Carpet &amp; adhesive</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Kitchen or restaurant line"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16v3a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"/><path d="M6 12V5a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2"/></svg><span>Kitchen or restaurant line</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Washrooms"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10v6H7z"/><path d="M5 9h14v3a7 7 0 0 1-14 0z"/><path d="M10 19v2h4v-2"/></svg><span>Washrooms</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Millwork &amp; counters"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="1"/><path d="M3 12h18M12 12v8M2 8h20"/></svg><span>Millwork &amp; counters</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Fixtures &amp; shelving"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v18M20 3v18M4 8h16M4 14h16"/></svg><span>Fixtures &amp; shelving</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Concrete cutting"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="18" height="8" rx="1"/><path d="M7 13l3-5 3 3 3-6"/></svg><span>Concrete cutting</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Exterior structure"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20M4 20V10l8-6 8 6v10"/><path d="M9 20v-6h6v6"/></svg><span>Exterior structure</span></button>
+          <button type="button" class="item" aria-pressed="false" data-item="Not sure — walk it with me"><span class="tick" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/></svg><span>Not sure — walk it with me</span></button>
+      </div>
+      <aside class="panel" aria-labelledby="panel-title">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <h3 id="panel-title">Your demo list</h3>
+          <span id="dl-count" class="muted" style="font-size:14px;font-weight:700">0 items</span>
+        </div>
+        <p class="empty" id="dl-empty">Nothing yet — tap the items on the left.</p>
+        <ol id="dl-list" aria-live="polite" hidden></ol>
+        <div class="stack" style="gap:10px">
+          <span style="font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--soft)">Approx. size</span>
+          <div class="sizes" id="dl-size">
+            <button type="button" class="chip" aria-pressed="false">Under 1,000 sq ft</button>
+            <button type="button" class="chip" aria-pressed="false">1,000–3,000</button>
+            <button type="button" class="chip" aria-pressed="false">3,000–10,000</button>
+            <button type="button" class="chip" aria-pressed="false">10,000+</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-gold" id="dl-send" disabled style="opacity:.5">Add my list to the quote →</button>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <!-- SERVICES -->
 <section id="services" class="sec" aria-labelledby="services-title">
   <div class="wrap pad stack" style="gap:48px">
@@ -590,6 +675,48 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
       <li><span class="n">03</span><h3>Controlled demo</h3><p>Protection up, dust controlled, and removal done to scope — around your neighbours and hours.</p></li>
       <li><span class="n">04</span><h3>Clean handover</h3><p>Debris hauled and recycled, site swept — handed to you, or straight to the Stallion build crew.</p></li>
     </ol>
+  </div>
+</section>
+
+<!-- READINESS CHECKLIST -->
+<section id="ready" class="sec alt" aria-labelledby="ready-title">
+  <div class="wrap pad stack" style="gap:40px">
+    <div class="stack" style="max-width:760px;gap:16px">
+      <p class="eyebrow">Ready for Demo?</p>
+      <h2 id="ready-title" class="h2">Five questions. <span class="gold">We handle whatever’s left.</span></h2>
+    </div>
+    <div class="ready">
+      <ul class="qs">
+        <li data-q="lease" data-help="We can walk the space with you before you sign">
+          <span class="q">Lease signed or property secured?<small>Know which space you’re working with.</small></span>
+          <span class="yn" role="group" aria-label="Lease signed or property secured?"><button type="button" data-v="yes" aria-pressed="false">Yes</button><button type="button" data-v="no" aria-pressed="false">Not yet</button></span>
+        </li>
+        <li data-q="hazmat" data-help="We coordinate hazardous materials testing up front">
+          <span class="q">Asbestos / hazardous materials test done?<small>Usually required before demolition in older buildings.</small></span>
+          <span class="yn" role="group" aria-label="Asbestos / hazardous materials test done?"><button type="button" data-v="yes" aria-pressed="false">Yes</button><button type="button" data-v="no" aria-pressed="false">Not yet</button></span>
+        </li>
+        <li data-q="permit" data-help="We confirm and coordinate the City of Calgary permit">
+          <span class="q">Know whether you need a permit?<small>Commercial demo often needs City of Calgary approval.</small></span>
+          <span class="yn" role="group" aria-label="Know whether you need a permit?"><button type="button" data-v="yes" aria-pressed="false">Yes</button><button type="button" data-v="no" aria-pressed="false">Not yet</button></span>
+        </li>
+        <li data-q="utilities" data-help="We coordinate disconnects with your building and trades">
+          <span class="q">Utilities ready to be disconnected or capped?<small>Power, water and gas made safe before we start.</small></span>
+          <span class="yn" role="group" aria-label="Utilities ready to be disconnected or capped?"><button type="button" data-v="yes" aria-pressed="false">Yes</button><button type="button" data-v="no" aria-pressed="false">Not yet</button></span>
+        </li>
+        <li data-q="build" data-help="Stallion Contracting can design and build your new space">
+          <span class="q">Plan for what gets built after?<small>Design, drawings and a builder lined up.</small></span>
+          <span class="yn" role="group" aria-label="Plan for what gets built after?"><button type="button" data-v="yes" aria-pressed="false">Yes</button><button type="button" data-v="no" aria-pressed="false">Not yet</button></span>
+        </li>
+      </ul>
+      <aside class="panel" aria-live="polite">
+        <span style="font-family:'Michroma',sans-serif;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--mute)">Your readiness</span>
+        <div style="display:flex;align-items:baseline;gap:12px"><span class="score" id="rd-score">0/5</span><span class="muted" id="rd-label">sorted</span></div>
+        <div class="meter" aria-hidden="true"><span id="rd-bar"></span></div>
+        <p style="margin:0;color:var(--soft)" id="rd-msg">Answer the questions to see what Stallion can take off your plate.</p>
+        <ul class="handle" id="rd-handle" hidden></ul>
+        <a class="btn btn-gold" href="#quote">Book my free site walk →</a>
+      </aside>
+    </div>
   </div>
 </section>
 
@@ -754,6 +881,7 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
 
 <script>
 (function () {
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Scope picker chips -> hidden form fields
   document.querySelectorAll('.chips').forEach(function (group) {
     var target = document.getElementById(group.dataset.target);
@@ -821,11 +949,76 @@ input[type=range]:focus-visible{outline:2px solid var(--gold2);outline-offset:2p
   }
   rent.addEventListener('input', calc); weeks.addEventListener('input', calc); calc();
 
+  // Demo list builder
+  var picked = [], size = '';
+  var listEl = document.getElementById('dl-list'), sendBtn = document.getElementById('dl-send');
+  function renderList(){
+    listEl.innerHTML = '';
+    picked.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; listEl.appendChild(li); });
+    listEl.hidden = !picked.length; document.getElementById('dl-empty').hidden = !!picked.length;
+    document.getElementById('dl-count').textContent = picked.length + (picked.length === 1 ? ' item' : ' items');
+    sendBtn.disabled = !picked.length; sendBtn.style.opacity = picked.length ? 1 : .5;
+  }
+  document.querySelectorAll('.item').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = b.querySelector('span:last-child').textContent, on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      picked = on ? picked.concat(t) : picked.filter(function (x) { return x !== t; });
+      renderList();
+    });
+  });
+  document.getElementById('dl-size').addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    var on = b.getAttribute('aria-pressed') !== 'true';
+    this.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', 'false'); });
+    b.setAttribute('aria-pressed', on ? 'true' : 'false'); size = on ? b.textContent.trim() : '';
+  });
+  sendBtn.addEventListener('click', function () {
+    var txt = 'Demo list: ' + picked.join(', ') + (size ? '\nApprox. size: ' + size + (size.indexOf('sq ft') < 0 ? ' sq ft' : '') : '');
+    document.getElementById('h-list').value = txt;
+    var msg = document.getElementById('f-msg');
+    msg.value = msg.value.replace(/^Demo list:[\s\S]*?(\n\n|$)/, '');
+    msg.value = txt + (msg.value ? '\n\n' + msg.value : '');
+    if (picked.length > 2) {
+      var full = document.querySelector('.chips[data-target="h-scope"] .chip');
+      if (full) full.click();
+    }
+    document.getElementById('quote').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    setTimeout(function () { document.getElementById('f-name').focus({ preventScroll: true }); }, 500);
+    sendBtn.textContent = 'Added to your quote ✓';
+    setTimeout(function () { sendBtn.textContent = 'Update my quote →'; }, 2500);
+  });
+
+  // Readiness checklist
+  var answers = {};
+  var checkSvg = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9973F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  function renderReady(){
+    var rows = document.querySelectorAll('.qs li'), yes = 0, answered = 0, help = [];
+    rows.forEach(function (li) { var v = answers[li.dataset.q]; if (v) answered++; if (v === 'yes') yes++; if (v === 'no') help.push(li.dataset.help); });
+    document.getElementById('rd-score').textContent = yes + '/5';
+    document.getElementById('rd-bar').style.width = (yes / 5 * 100) + '%';
+    var msg = document.getElementById('rd-msg'), ul = document.getElementById('rd-handle');
+    if (!answered) msg.textContent = 'Answer the questions to see what Stallion can take off your plate.';
+    else if (yes === 5) msg.textContent = 'You’re ready to go. Book your site walk and we’ll lock in a demo date.';
+    else if (help.length) msg.textContent = 'No problem — here’s what we’ll handle for you:';
+    else msg.textContent = 'Looking good so far — keep going.';
+    ul.innerHTML = help.map(function (h) { return '<li>' + checkSvg + '<span>' + h + '</span></li>'; }).join('');
+    ul.hidden = !help.length;
+  }
+  document.querySelectorAll('.qs li').forEach(function (li) {
+    li.querySelectorAll('.yn button').forEach(function (b) {
+      b.addEventListener('click', function () {
+        li.querySelectorAll('.yn button').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+        answers[li.dataset.q] = b.dataset.v; renderReady();
+      });
+    });
+  });
+
   // Scroll reveal + count-up
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if ('IntersectionObserver' in window && !reduce) {
     document.documentElement.classList.add('js');
-    var groups = ['.sec .eyebrow + .h2', '.cards > *', '.steps > li', '.rows > div', '.photos > figure', '.boxes > div', '.timeline-card', '.calc', '.offer', '.list-2', '.photo.tall', '.areas', '.faq'];
+    var groups = ['.sec .eyebrow + .h2', '.items > .item', '.qs li', '.panel', '.cards > *', '.steps > li', '.rows > div', '.photos > figure', '.boxes > div', '.timeline-card', '.calc', '.offer', '.list-2', '.photo.tall', '.areas', '.faq'];
     groups.forEach(function (sel) {
       document.querySelectorAll(sel).forEach(function (el, i) {
         if (el.closest('.hero')) return;
